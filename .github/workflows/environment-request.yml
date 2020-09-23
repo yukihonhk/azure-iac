@@ -1,0 +1,36 @@
+name: Environment Creation Workflow
+on: 
+  issues:
+    types: [labeled]
+
+jobs:
+  build:
+    name: EnvironmentCreation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: wviriya/azure-iac/.github/actions/request-parser@master
+        id: parser
+
+      - uses: azure/login@v1
+        if: steps.parser.outputs.approved
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - uses: azure/CLI@v1
+        if: steps.parser.outputs.approved
+        with:
+          inlineScript: |
+            az group create -n ${{ steps.parser.outputs.appName }}-rg -l ${{ secrets.DefaultAzureLocation }}
+            az group deployment create -g ${{ steps.parser.outputs.appName }}-rg --template-file $GITHUB_WORKSPACE/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json --parameters name=${{ steps.parser.outputs.appName }} password=${{ secrets.DefaultPassword }}
+
+      - uses: peter-evans/create-or-update-comment@v1.0.0
+        if: steps.parser.outputs.approved
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### 🚀All Set! 🚀
+            Check your Azure Subscription for Resource Group: **${{ steps.parser.outputs.appName }}-rg**
+          reaction-type: hooray

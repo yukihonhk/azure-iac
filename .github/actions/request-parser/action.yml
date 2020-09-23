@@ -1,0 +1,13 @@
+name: 'request-parser'
+description: 'Parses an Environment Request Issue into output parameters that can be used for creating the environments.'
+author: 'wviriya'
+runs:
+  using: 'node12'
+  main: './request-parser.js'
+outputs:
+  appName:
+    description: Name of app as input by requester
+  armTemplate:
+    description: 'Refers to the ARM templates in the /templates directory [vmss-windows-nat,web-app-sql-database,function-app]'
+  approved:
+    description: 'Validates that the issue has an approved label applied'
