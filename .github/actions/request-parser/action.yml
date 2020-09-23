@@ -11,7 +11,3 @@ outputs:
     description: 'Refers to the ARM templates in the /templates directory [vmss-windows-nat,web-app-sql-database,function-app]'
   approved:
     description: 'Validates that the issue has an approved label applied'
-  applyPolicy:
-    description: 'Indicates that a policy set needs to be assigned'
-  policyName:
-    description: 'Which policy set to apply to the resources'
