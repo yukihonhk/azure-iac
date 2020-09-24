@@ -33,7 +33,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
           # Provide the name of a resource group, only required for resource Group deployments.
           resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
-          template: $GITHUB_WORKSPACE/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
+          template: ${{ github.workspace }}/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
           parameters: name=${{ steps.parser.outputs.appName }} password=${{ secrets.DefaultPassword }}
 
       # Deployment of template    
@@ -48,7 +48,7 @@ jobs:
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
           # Provide the name of a resource group, only required for resource Group deployments.
           resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
-          template: $GITHUB_WORKSPACE/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
+          template: ${{ github.workspace }}/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
           parameters: name=${{ steps.parser.outputs.appName }} identity=${{ secrets.MSI }}
 
       - uses: peter-evans/create-or-update-comment@v1.0.0
