@@ -4,7 +4,6 @@ on:
     types: [labeled]
 
 env:
-  RESOURCE_GROUP: gha-demo-rg
   LOCATION: australiaeast
 
 jobs:
@@ -33,7 +32,7 @@ jobs:
           region: ${{ env.LOCATION }}
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
           # Provide the name of a resource group, only required for resource Group deployments.
-          resourceGroupName: ${{ env.RESOURCE_GROUP }}
+          resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
           template: $GITHUB_WORKSPACE/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
           parameters: name=${{ steps.parser.outputs.appName }} password=${{ secrets.DefaultPassword }}
 
@@ -48,7 +47,7 @@ jobs:
           region: ${{ env.LOCATION }}
           subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}  
           # Provide the name of a resource group, only required for resource Group deployments.
-          resourceGroupName: ${{ env.RESOURCE_GROUP }}
+          resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
           template: $GITHUB_WORKSPACE/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
           parameters: name=${{ steps.parser.outputs.appName }} identity=${{ secrets.MSI }}
 
