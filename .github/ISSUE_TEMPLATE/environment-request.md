@@ -9,6 +9,7 @@ assignees: ''
 
 ### Application Information
 Application Name: 
+Resource Group Name: 
 Business Justification: 
 Link to Application Repo: 
 
