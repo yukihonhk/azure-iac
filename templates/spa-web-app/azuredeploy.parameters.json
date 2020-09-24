@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "azninjaweb" //"ProvideUniqueAppName"
+    },
+    "identity": {
+      "value": "/subscriptions/c1a37f4e-c839-41b3-a627-5ea61b973cd1/resourceGroups/common-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wviriya-mid" //"/subscriptions/[xxxxxx-xxxx-xxxxx-xxxx-xxxxxxxxxx]/resourceGroups/[resource-group]/providers/Microsoft.ManagedIdentity/userAssignedIdentities/[msi]"
+    }
+  }
+}

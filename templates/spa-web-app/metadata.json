@@ -1,0 +1,11 @@
+{
+  "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+  "type": "QuickStart",
+  "itemDisplayName": "Provision a API App and Storage Account ",
+  "description": "This template provisions a API App, a Storage Account for static website and App Insights.",
+  "summary": "Provision a API App with a Storage Account for static website",
+  "githubUsername": "wviriya",
+  "dateUpdated": "2020-09-24"
+}
+
+

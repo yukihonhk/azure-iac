@@ -1,0 +1,161 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the application. Will be used by default as resource name prefix."
+      }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "Dev",
+      "allowedValues": [
+        "Dev",
+        "Test",
+        "QA",
+        "Stage",
+        "Beta",
+        "Prod"
+      ]
+    },
+    "webAppTier": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "webAppInstances": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "identity": {
+      "type": "string",
+      "metadata": {
+        "description": "MSI to execute AZ CLI"
+      }
+    }
+  },
+  "variables": {
+    "appNameWithEnv": "[toLower(concat(parameters('name'),'-',parameters('environmentName')))]",
+    "webAppPlanName": "[concat(variables('appNameWithEnv'),'-asp')]",
+    "webAppName": "[variables('appNameWithEnv')]",
+    "appInsightsName": "[concat(variables('appNameWithEnv'),'-ai')]",
+    "storageAccountName": "[toLower(replace(concat(variables('webAppName'),'staticweb'),'-',''))]",
+    "location": "[resourceGroup().location]"
+  },
+  "resources": [
+    {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
+            "name": "[variables('storageAccountName')]",
+            "location": "[variables('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "accessTier": "Hot"
+            }
+    },
+    {
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2019-10-01-preview",
+      "name": "configStaticWeb",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[variables('storageAccountName')]"
+      ],
+      "kind": "AzureCLI",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[parameters('identity')]": {}
+        }
+      },
+      "properties": {
+        "AzCliVersion": "2.0.80",
+        "timeout": "PT30M",
+        "arguments": "[variables('storageAccountName')]",
+        "scriptContent": "az storage blob service-properties update --account-name $1 --static-website --404-document notfound.html --index-document index.html",
+        "cleanupPreference": "Always",
+        "retentionInterval": "P1D"
+      }
+    },
+    {
+      "apiVersion": "2018-02-01",
+      "name": "[variables('webAppPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[variables('location')]",
+      "tags": {
+        "displayName": "HostingPlan"
+      },
+      "sku": {
+        "name": "[parameters('webAppTier')]",
+        "capacity": "[parameters('webAppInstances')]"
+      },
+      "properties": {
+        "name": "[variables('webAppPlanName')]"
+      }
+    },
+    {
+      "apiVersion": "2018-02-01",
+      "name": "[variables('webAppName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[variables('webAppPlanName')]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('webAppPlanName')))]": "empty",
+        "displayName": "Website"
+      },
+      "properties": {
+        "name": "[variables('webAppName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webAppPlanName'))]"
+      }
+    },
+    {
+      "apiVersion": "2015-05-01",
+      "name": "[variables('appInsightsName')]",
+      "type": "Microsoft.Insights/components",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[variables('webAppName')]"
+      ],
+      "tags": {
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('webAppName')))]": "Resource",
+        "displayName": "AppInsightsComponent"
+      },
+      "properties": {
+        "ApplicationId": "[variables('webAppName')]",
+        "Application_Type": "web"
+      }
+    }
+  ],
+  "outputs": {
+    "webAppName": {
+      "type": "string",
+      "value": "[variables('webAppName')]"
+    },
+    "webAppFqdn": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Web/sites/', variables('webAppName'))).hostnames[0]]"
+    }
+  }
+}
