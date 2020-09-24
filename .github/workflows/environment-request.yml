@@ -58,5 +58,5 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body: |
             ### 🚀All Set! 🚀
-            Check your Azure Subscription for Resource Group: **${{ steps.parser.outputs.appName }}-rg**
+            Check your Azure Subscription for Resource Group: **${{ steps.parser.outputs.resourceGroup }}**
           reaction-type: hooray
