@@ -37,6 +37,8 @@ const run = async () => {
         for (var i = 0; i < lines.length; i++) {
             if (lines[i].startsWith("Application Name:"))
                 appName = lines[i].substring(17, lines[i].length).trim();
+            if (lines[i].startsWith("Resource Group Name:"))
+                appName = lines[i].substring(20, lines[i].length).trim();
             if (lines[i].startsWith("- [x] General"))
                 armTemplate = "vmss-windows-nat";
             if (lines[i].startsWith("- [x] SPA"))
