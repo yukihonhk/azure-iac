@@ -1,0 +1,24 @@
+{
+  "private": true,
+  "name": "MercuryHealth-Actions",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc --noEmit && jest"
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "@actions/core": "^1.2.0",
+    "@actions/github": "^2.0.0",
+    "@types/jest": "^24.0.25",
+    "@types/js-yaml": "^3.12.1",
+    "@types/nock": "^11.1.0",
+    "@types/node": "^13.1.5",
+    "jest": "^24.9.0",
+    "js-yaml": "^3.13.1",
+    "nock": "^11.7.2",
+    "ts-jest": "^24.3.0",
+    "typescript": "^3.7.4"
+  }
+}
