@@ -110,6 +110,7 @@
           param([string] $storageAccount, [string] $resourceGroup)
           $storage = Get-AzStorageAccount -ResourceGroupName $resourceGroup -Name $storageAccount
           $output = $storage.PrimaryEndpoints.Web
+          $output = $output.TrimEnd('/')
           Write-Output $output
           $DeploymentScriptOutputs = @{}
           $DeploymentScriptOutputs['text'] = $output
