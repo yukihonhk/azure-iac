@@ -20,27 +20,16 @@
         "Prod"
       ]
     },
-    "webAppTier": {
+    "runtime": {
       "type": "string",
-      "defaultValue": "S1",
+      "defaultValue": "node",
       "allowedValues": [
-        "S1",
-        "S2",
-        "S3",
-        "P1",
-        "P2",
-        "P3"
+        "node",
+        "dotnet",
+        "java"
       ],
       "metadata": {
-        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
-      }
-    },
-    "webAppInstances": {
-      "type": "int",
-      "defaultValue": 1,
-      "minValue": 1,
-      "metadata": {
-        "description": "Describes plan's instance count"
+        "description": "The language worker runtime to load in the function app."
       }
     },
     "identity": {
@@ -52,10 +41,10 @@
   },
   "variables": {
     "appNameWithEnv": "[toLower(concat(parameters('name'),'-',parameters('environmentName')))]",
-    "webAppPlanName": "[concat(variables('appNameWithEnv'),'-asp')]",
-    "webAppName": "[variables('appNameWithEnv')]",
+    "hostingPlanName": "[concat(variables('appNameWithEnv'),'-asp')]",
+    "functionAppName": "[variables('appNameWithEnv')]",
     "appInsightsName": "[concat(variables('appNameWithEnv'),'-ai')]",
-    "storageAccountName": "[toLower(replace(concat(variables('webAppName'),'staticweb'),'-',''))]",
+    "storageAccountName": "[toLower(replace(concat(variables('functionAppName'),'app'),'-',''))]",
     "location": "[resourceGroup().location]"
   },
   "resources": [
@@ -98,64 +87,134 @@
       }
     },
     {
-      "apiVersion": "2018-02-01",
-      "name": "[variables('webAppPlanName')]",
+      "type": "Microsoft.Resources/deploymentScripts",
+      "apiVersion": "2019-10-01-preview",
+      "name": "getStaticWebURL",
+      "dependsOn": [
+        "configStaticWeb"
+      ],
+      "location": "[variables('location')]",
+      "kind": "AzurePowerShell",
+      "identity": {
+        "type": "userAssigned",
+        "userAssignedIdentities": {
+          "[parameters('identity')]": {
+          }
+        }
+      },
+      "properties": {
+        "azPowerShellVersion": "3.0",
+        "timeout": "PT30M",
+        "arguments": "[concat('-storageAccount ',variables('storageAccountName'),' -resourceGroup ',resourceGroup().name)]",
+        "scriptContent": "
+          param([string] $storageAccount, [string] $resourceGroup)
+          $storage = Get-AzStorageAccount -ResourceGroupName $resourceGroup -Name $storageAccount
+          $output = $storage.PrimaryEndpoints.Web
+          Write-Output $output
+          $DeploymentScriptOutputs = @{}
+          $DeploymentScriptOutputs['text'] = $output
+        ",
+        "cleanupPreference": "Always",
+        "retentionInterval": "P1D"
+      }
+    },
+    {
+      "apiVersion": "2020-06-01",
+      "name": "[variables('hostingPlanName')]",
       "type": "Microsoft.Web/serverfarms",
       "location": "[variables('location')]",
       "tags": {
         "displayName": "HostingPlan"
       },
       "sku": {
-        "name": "[parameters('webAppTier')]",
-        "capacity": "[parameters('webAppInstances')]"
+        "name": "Y1",
+        "tier": "Dynamic"
       },
       "properties": {
-        "name": "[variables('webAppPlanName')]"
+        "name": "[variables('hostingPlanName')]",
+        "computeMode": "Dynamic"
       }
     },
     {
-      "apiVersion": "2018-02-01",
-      "name": "[variables('webAppName')]",
       "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('functionAppName')]",
       "location": "[variables('location')]",
+      "kind": "functionapp",
       "dependsOn": [
-        "[variables('webAppPlanName')]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "getStaticWebURL"
       ],
-      "tags": {
-        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('webAppPlanName')))]": "empty",
-        "displayName": "Website"
-      },
       "properties": {
-        "name": "[variables('webAppName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webAppPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'), ';EndpointSuffix=', environment().suffixes.storage, ';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2019-06-01').keys[0].value)]"
+            },
+            {
+              "name": "WEBSITE_CONTENTSHARE",
+              "value": "[toLower(variables('functionAppName'))]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~2"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~10"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('microsoft.insights/components', variables('appInsightsName')), '2020-02-02-preview').InstrumentationKey]"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "[parameters('runtime')]"
+            }
+          ],
+          "cors": {
+            "allowedOrigins": [
+              "[reference('getStaticWebURL').outputs.text]"
+            ]
+          }    
+        }
       }
     },
     {
-      "apiVersion": "2015-05-01",
-      "name": "[variables('appInsightsName')]",
       "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('appInsightsName')]",
       "location": "[variables('location')]",
-      "dependsOn": [
-        "[variables('webAppName')]"
-      ],
       "tags": {
-        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('webAppName')))]": "Resource",
-        "displayName": "AppInsightsComponent"
+        "[concat('hidden-link:', resourceId('Microsoft.Web/sites', variables('appInsightsName')))]": "Resource"
       },
       "properties": {
-        "ApplicationId": "[variables('webAppName')]",
-        "Application_Type": "web"
+        "ApplicationId": "[variables('appInsightsName')]",
+        "Request_Source": "IbizaWebAppExtensionCreate"
       }
     }
   ],
   "outputs": {
-    "webAppName": {
+    "appName": {
       "type": "string",
-      "value": "[variables('webAppName')]"
+      "value": "[variables('functionAppName')]"
     },
-    "webAppFqdn": {
+    "appFqdn": {
       "type": "string",
-      "value": "[reference(concat('Microsoft.Web/sites/', variables('webAppName'))).hostnames[0]]"
+      "value": "[reference(concat('Microsoft.Web/sites/', variables('functionAppName'))).hostnames[0]]"
+    },
+    "staticWebURL": {
+      "type": "string",
+      "value": "[reference('getStaticWebURL').outputs.text]"
     }
+
   }
 }

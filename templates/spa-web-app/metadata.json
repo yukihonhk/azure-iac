@@ -1,11 +1,12 @@
 {
   "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
   "type": "QuickStart",
-  "itemDisplayName": "Provision a API App and Storage Account ",
-  "description": "This template provisions a API App, a Storage Account for static website and App Insights.",
-  "summary": "Provision a API App with a Storage Account for static website",
+  "itemDisplayName": "Provision a function app on a Consumption plan and enable storage account for static website",
+  "description": "This template provisions a function app on a Consumption plan, which is a dynamic hosting plan. The app runs on demand and you're billed per execution, with no standing resource committment. There are other templates available for provisioning on a dedicated hosting plan.",
+  "summary": "Provision a function app that runs on a Consumption (dynamic hosting) plan and enable storage accunt for static website",
   "githubUsername": "wviriya",
-  "dateUpdated": "2020-09-24"
+  "docOwner": "ggailey777",
+  "dateUpdated": "2020-09-17"
 }
 
 

@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "name": {
-      "value": "azninjaweb" //"ProvideUniqueAppName"
+      "value": "ProvideUniqueAppName"
     },
     "identity": {
-      "value": "/subscriptions/c1a37f4e-c839-41b3-a627-5ea61b973cd1/resourceGroups/common-rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/wviriya-mid" //"/subscriptions/[xxxxxx-xxxx-xxxxx-xxxx-xxxxxxxxxx]/resourceGroups/[resource-group]/providers/Microsoft.ManagedIdentity/userAssignedIdentities/[msi]"
+      "value": "/subscriptions/[xxxxxx-xxxx-xxxxx-xxxx-xxxxxxxxxx]/resourceGroups/[resource-group]/providers/Microsoft.ManagedIdentity/userAssignedIdentities/[msi]"
     }
   }
 }
