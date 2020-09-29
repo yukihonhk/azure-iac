@@ -29,7 +29,7 @@ const run = async () => {
             core.setOutput('approved', 'false');
             return;
         }
-        let appName = "", armTemplate = "", resourceGroup = "";
+        let appName = "", armTemplate = "", resourceGroup = "", environment = "";
         console.log(issue.body);
         const lines = issue.body.match(/[^\r\n]+/g);
         if (!lines)
@@ -39,6 +39,8 @@ const run = async () => {
                 appName = lines[i].substring(17, lines[i].length).trim();
             if (lines[i].startsWith("Resource Group Name:"))
                 resourceGroup = lines[i].substring(20, lines[i].length).trim();
+            if (lines[i].startsWith("Environment Name:"))
+                environment = lines[i].substring(17, lines[i].length).trim();
             if (lines[i].startsWith("- [x] General"))
                 armTemplate = "vmss-windows-nat";
             if (lines[i].startsWith("- [x] SPA"))
@@ -51,6 +53,7 @@ const run = async () => {
         core.setOutput('appName', appName);
         core.setOutput('armTemplate', armTemplate);
         core.setOutput('resourceGroup', resourceGroup);
+        core.setOutput('environment', environment);
         core.setOutput('approved', 'true');
     }
     catch (error) {
