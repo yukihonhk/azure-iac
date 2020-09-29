@@ -17,7 +17,13 @@
         "QA",
         "Stage",
         "Beta",
-        "Prod"
+        "Prod",
+        "dev",
+        "test",
+        "qa",
+        "stage",
+        "beta",
+        "prod"
       ]
     },
     "runtime": {
