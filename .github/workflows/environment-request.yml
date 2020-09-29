@@ -34,7 +34,7 @@ jobs:
           # Provide the name of a resource group, only required for resource Group deployments.
           resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
           template: ${{ github.workspace }}/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
-          parameters: name=${{ steps.parser.outputs.appName }} password=${{ secrets.DefaultPassword }}
+          parameters: name=${{ steps.parser.outputs.appName }} password=${{ secrets.DefaultPassword }} environmentName=${{ steps.parser.outputs.environment }}
 
       # Deployment of template    
       - name: Deploy Azure Resource Manager (ARM) Template
@@ -49,7 +49,7 @@ jobs:
           # Provide the name of a resource group, only required for resource Group deployments.
           resourceGroupName: ${{ steps.parser.outputs.resourceGroup }}
           template: ${{ github.workspace }}/templates/${{ steps.parser.outputs.armTemplate }}/azuredeploy.json  # Set this to the location of your template file
-          parameters: name=${{ steps.parser.outputs.appName }} identity=${{ secrets.MSI }}
+          parameters: name=${{ steps.parser.outputs.appName }} identity=${{ secrets.MSI }} environmentName=${{ steps.parser.outputs.environment }}
 
       - uses: peter-evans/create-or-update-comment@v1.0.0
         if: steps.parser.outputs.approved
