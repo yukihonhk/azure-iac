@@ -22,6 +22,24 @@
             "metadata": {
                     "description": "Location for all resources."
                 }
+        },
+        "environmentName": {
+            "type": "string",
+            "defaultValue": "Dev",
+            "allowedValues": [
+                "Dev",
+                "Test",
+                "QA",
+                "Stage",
+                "Beta",
+                "Prod",
+                "dev",
+                "test",
+                "qa",
+                "stage",
+                "beta",
+                "prod"
+            ]
         }
     },
      "variables": {

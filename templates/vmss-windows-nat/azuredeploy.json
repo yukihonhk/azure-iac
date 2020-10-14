@@ -48,6 +48,24 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
+    },
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "Dev",
+      "allowedValues": [
+        "Dev",
+        "Test",
+        "QA",
+        "Stage",
+        "Beta",
+        "Prod",
+        "dev",
+        "test",
+        "qa",
+        "stage",
+        "beta",
+        "prod"
+      ]
     }
   },
   "variables": {

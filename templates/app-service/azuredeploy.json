@@ -2,7 +2,7 @@
      "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
      "contentVersion": "1.0.0.0",
      "parameters": {
-          "webappName": {
+          "name": {
                "type": "string",
                "metadata": {
                     "description": "Web App Name"
@@ -61,6 +61,24 @@
                "metadata": {
                "description": "Not use in this template"
                }
+          },
+          "environmentName": {
+               "type": "string",
+               "defaultValue": "Dev",
+               "allowedValues": [
+               "Dev",
+               "Test",
+               "QA",
+               "Stage",
+               "Beta",
+               "Prod",
+               "dev",
+               "test",
+               "qa",
+               "stage",
+               "beta",
+               "prod"
+               ]
           }
      },
      "functions": [],
