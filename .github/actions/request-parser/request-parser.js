@@ -47,6 +47,8 @@ const run = async () => {
                 armTemplate = "spa-web-app";
             if (lines[i].startsWith("- [x] Web"))
                 armTemplate = "web-app-sql-database";
+            if (lines[i].startsWith("- [x] App"))
+                armTemplate = "app-service";
             if (lines[i].startsWith("- [x] Serverless"))
                 armTemplate = "function-app";
         }
