@@ -83,7 +83,7 @@
      },
      "functions": [],
      "variables": {
-          "appServicePlanName": "[concat(parameters('webappName'),'-asp')]",
+          "appServicePlanName": "[concat(parameters('name'),'-asp')]",
           "os": "[if(equals(toLower(parameters('os')),'linux'),'linux','app')]"
      },
      "resources": [
@@ -106,19 +106,19 @@
           },
           {
                
-               "name": "[parameters('webappName')]",
+               "name": "[parameters('name')]",
                "type": "Microsoft.Web/sites",
                "apiVersion": "2019-08-01",
                "location": "[parameters('region')]",
                "tags": {
                     "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/',variables('appServicePlanName'))]": "Resource",
-                    "displayName": "[parameters('webappName')]"
+                    "displayName": "[parameters('name')]"
                },
                "dependsOn": [
                     "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
                ],
                "properties": {
-                    "name": "[parameters('webappName')]",
+                    "name": "[parameters('name')]",
                     "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
                     "siteConfig": {
                          "connectionStrings": [
@@ -132,12 +132,12 @@
                }
           },
           {
-               "name": "[concat(parameters('webappName'),'/', parameters('slots')[copyIndex()].name)]",
+               "name": "[concat(parameters('name'),'/', parameters('slots')[copyIndex()].name)]",
                "type": "Microsoft.Web/sites/slots",
                "apiVersion": "2019-08-01",
                "location": "[parameters('region')]",
               "dependsOn": [
-                    "[resourceId('Microsoft.Web/sites', parameters('webappName'))]"
+                    "[resourceId('Microsoft.Web/sites', parameters('name'))]"
                ],
                "properties": {
                     "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
