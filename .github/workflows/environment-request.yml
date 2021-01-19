@@ -4,7 +4,7 @@ on:
     types: [labeled]
 
 env:
-  LOCATION: eastssia
+  LOCATION: eastasia
 
 jobs:
   build:
