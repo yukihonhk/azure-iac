@@ -4,7 +4,7 @@ on:
     types: [labeled]
 
 env:
-  LOCATION: eastasia
+  LOCATION: australiaeast
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - uses: wviriya/azure-iac/.github/actions/request-parser@master
+      - uses: yukihonhk/azure-iac/.github/actions/request-parser@master
         id: parser
 
       - uses: azure/login@v1
