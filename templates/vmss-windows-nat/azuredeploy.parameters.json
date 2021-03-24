@@ -18,10 +18,7 @@
       "value": "windows"
     },
     "password": {
-      "value": "GEN-PASSWORD"
-    },
-    "adminPassword": {
-      "value": "GEN-PASSWORD"
+      "value": "abc123"
     }
   }
 }
