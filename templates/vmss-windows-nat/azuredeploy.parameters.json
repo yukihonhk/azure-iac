@@ -19,6 +19,9 @@
     },
     "password": {
       "value": "GEN-PASSWORD"
+    },
+    "adminPassword": {
+      "value": "GEN-PASSWORD"
     }
   }
 }
